@@ -1,0 +1,172 @@
+extends layout.pug
+
+block headscripts
+  script(src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js")
+  script(src="https://unpkg.com/vue-router/dist/vue-router.js")
+
+block content
+  include includes/templates.pug
+  #root
+    .d-flex.viewport
+      .sidebar.mr-4.box.d-flex.flex-column
+        .site-header.justify-content-center.box.d-flex.flex-column.text-center.t-shadow
+          button(
+            @click="handleToggleSensitive"
+            :class="{ 'la-otter': !$data.$sensitive, 'la-user-secret': $data.$sensitive }"
+          ).las.display-4.btn--naked.text-white
+          h1.h4.brand.mb-0 Acme Banking
+        .scrollarea
+          form(id="search-form" @submit="handleSubmit").p-3
+            .form-group
+              label(for="queryString" class="small text-white-50") Query
+              input(
+                id="queryString"
+                name="queryString"
+                v-model="form.queryString"
+                class="form-control"
+                @change="handleChange"
+              )
+
+            div
+              .form-group
+                label(for="date" class="small text-white-50") Start Date
+                input(
+                  id="date"
+                  name="startDate"
+                  type="date"
+                  class="form-control"
+                  v-model="form.startDate"
+                  @change="handleChange"
+                )
+
+            .form-group
+                label(for="category" class="small text-white-50") Cateogry
+                select(
+                  id="category"
+                  name="category"
+                  class="form-control"
+                  v-model="form.category"
+                  @change="handleChange"
+                )
+                  option(value="") Choose...
+                  option(
+                    v-for="opt in categoryOptions"
+                    :value="opt.value"
+                  ) {{opt.label}}
+
+            .d-flex.form-actions
+              button(
+                type="submit"
+                class="btn btn-primary"
+                :disabled="isSubmitting"
+              ).btn.btn-light.d-flex.align-items-center.position-relative
+                div(v-if="isSubmitting" role="status").position-absolute.loader-centered
+                  .spinner-border.spinner-border-sm
+                  .sr-only Loading...
+                div(:class="{ 'is-hidden': isSubmitting }") Search
+              button(@click="handleReset" title="Reset").btn.btn-outline-light
+                i.la.la-times-circle
+          .list-group.list-group-flush.list-group--glass
+            button(@click="handleFetch" value="/investments").list-group-item.list-group-item-action
+              i.mr-2.la.la-briefcase
+              | Investments
+            button(@click="handleFetch" value="/user").list-group-item.list-group-item-action
+              i.mr-2.la.la-user
+              | User
+            button(@click="handleFetchStatistics").list-group-item.list-group-item-action
+              i.mr-2.la.la-chart-bar
+              | Statistics
+            button(@click="handleFetch" value="/accounts/list").list-group-item.list-group-item-action
+              i.mr-2.la.la-list
+              | Accounts
+            button(@click="handleFetch" value="/loans").list-group-item.list-group-item-action
+              i.mr-2.la.la-key
+              | Loans
+        .box.mt-auto
+          a.btn.btn-dark.btn-block(href='/') Restart
+
+      .container-fluid.px-0.box
+        .mr-4.d-flex.flex-column.vh
+          .site-header.box.text-center2.brand.d-flex.align-items-end.flex-none
+            div
+              .p-5(v-if="!response.count")
+                p(v-if="!isSubmitting").mb-0.h2 No results
+                p(v-if="isSubmitting").mb-0.h2 Loading...
+              .sum.p-3(:class="{ loading: isSubmitting }" v-if="response.count")
+                span.t-shadow {{ sum | amount | sensitive | currency }}
+                p.text-white-50.lead.mb-0
+                  | Based on {{ response.count }} transactions
+                  | in the past {{ form.startDate | daysAgo }} days.
+            div(v-if="numPages > 1").ml-auto.p-3
+              .btn-group
+                //- button(v-for="index in numPages" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
+                template(v-for="index in numPages")
+                  button(v-if="index < 5" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
+                  .btn-group(v-if="index === 5" role="group")
+                    button(id="btnGroupDrop1" @click="handleTogglePagination" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false").btn.btn-outline-light.dropdown-toggle
+                      | ...
+                    .dropdown-menu.dropdown-menu-right(aria-labelledby="btnGroupDrop1" :class="{ show: isPaginationOpen }")
+                      button(v-for="index in numPages" v-if="index >= 5 && index <= numPages - 2" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").dropdown-item {{ index }}
+                  button(v-if="index > numPages - 2 && numPages > 5" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
+          transaction-list(
+            :key="'tranaction-list' + $data.$sensitive"
+            v-if="response.count"
+            :transactions="response.results"
+            :interactive="true"
+            :mapping="categoryMap"
+            :on-category="onChangeCategory"
+            @similar="searchSimilar"
+          ).scrollarea
+
+        drawer(
+          :open="Object.keys(secondaryData).length"
+          :title="secondaryType"
+          :key="'entity-drawer' + $data.$sensitive"
+          @close="handleCloseDebug"
+        ).drawer
+          accounts(
+            v-if="secondaryType.indexOf('accounts') > -1"
+            key="accounts"
+            :entities="secondaryData.accounts"
+          )
+          accounts(
+            v-else-if="secondaryType.indexOf('loans') > -1"
+            key="loans"
+            :entities="secondaryData.loans"
+          )
+          investments(
+            v-else-if="secondaryType.indexOf('investments') > -1"
+            :entities="secondaryData.portfolios"
+          )
+          user(
+            v-else-if="secondaryType.indexOf('user') > -1"
+            :user="secondaryData"
+          )
+          pre(v-else).text-white {{ secondaryData | json }}
+
+        drawer(
+          :open="!!similarTransactions.length"
+          :key="'similar-drawer' + $data.$sensitive"
+          title="Similar transactions"
+          @close="handleCloseDrawer"
+        ).drawer
+          transaction-list(
+            v-if="similarTransactions.length"
+            :transactions="similarTransactions"
+            :mapping="categoryMap"
+          ).scrollarea
+
+    div(v-if="error").alert-container.position-absolute.shadow
+      .alert.alert-glass.mb-0.d-flex.align-items-center.pr-2
+        p.mb-0 {{error}}
+        button(@click="handleClearError").btn.btn-outline-light.ml-4 &times
+
+  script(src="/js/http.js")
+  script(src="/js/components/empty.js")
+  script(src="/js/components/category.js")
+  script(src="/js/components/drawer.js")
+  script(src="/js/components/user.js")
+  script(src="/js/components/accounts.js")
+  script(src="/js/components/investments.js")
+  script(src="/js/components/transaction-list.js")
+  script(src="/js/app.js")

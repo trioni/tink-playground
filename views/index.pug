@@ -1,0 +1,16 @@
+extends layout.pug
+
+block content
+    .p-4.mb-4.justify-content-center.box2.d-flex.flex-column.text-center.t-shadow
+      i.las.la-otter.display-2
+      h1.h2.brand.mb-0 Acme Banking
+    form(action="/login").d-flex.flex-column.align-items-center.box.p-4.w-50.mx-auto
+      .form-group.row
+        label(for="market") Market
+        select.form-control(name="market" id="market").mb-3
+          each opt in marketOptions
+            option(value=opt.value selected=opt.value == 'SE')= opt.label
+      .form-group.form-check.row
+        input.form-check-input(type="checkbox" name="test" id="test" value="test")
+        label.form-check-label(for="test") Test providers
+      button(type="submit").btn.btn-light Connect

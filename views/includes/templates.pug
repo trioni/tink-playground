@@ -1,0 +1,110 @@
+template#tpl-category
+  div {{ categoryId | category(mapping) }}
+
+template#tpl-empty
+  div(role="alert").alert.text-center
+    .i.la.la-ghost.display-1.d-block
+    h2 Boo!
+    p Nothing to see here. Move along
+
+template#tpl-accounts
+  .scrollarea
+    .mx-3
+      empty(v-if="!entities.length")
+      div(v-else v-for="account in entities").card.text-dark.my-3
+        .card-header.d-flex {{ account.name }}
+          span(:class="{ 'badge-warning': account.type.toLowerCase() === 'loan', 'badge-secondary': account.type.toLowerCase() === 'checking'}").badge.ml-auto.align-self-center {{ account.type }}
+        .card-body
+          .media
+            img(v-if="account.images" :src="account.images.icon" style="width: 40px;").mr-3
+            .media-body
+              dl.mb-0
+                dt Balance
+                dd {{ account.balance | amount | sensitive | currency }}
+                dt Account Number
+                dd {{ account.accountNumber || account.loanNumber | sensitive }}
+                dt(v-if="account.interest") Interest
+                dd(v-if="account.interest") {{ account.interest | sensitive(0,1) | percent }}
+    //- pre.text-white {{ entities | json }}
+template#tpl-investments
+  .scrollarea
+    .mx-3
+      empty(v-if="!entities.length")
+      .card(v-else v-for="investment in entities").my-3.text-dark
+        .card-header.d-flex {{ investment.type }}
+          span.ml-auto {{ investment.totalValue | amount | sensitive }}
+        ul.list-group.text-dark
+          li.d-flex.list-group-item.align-items-center(v-for="instrument in investment.instruments") 
+            .badge.badge-light.mr-2 {{ instrument.type }}
+            span {{ instrument.name }}
+            span.ml-auto {{ instrument.marketValue }}
+        //- pre {{ investment | json }}
+
+template#tpl-user
+  .scrollarea
+    .card.text-dark.mx-3
+      .text-center.bg-light.p-4
+        i.la.la-user-alt.display-2
+      .card-body
+        h4.card-title
+          | {{ user.username || user.profile.fraudPersonNumber || 'No name available'}}
+        dl.mb-0.row
+          dt.col-sm-4 Locale
+          dd.col-sm-8 {{ user.profile.locale }}
+          dt.col-sm-4 Market
+          dd.col-sm-8 {{ user.profile.market }}
+          dt.col-sm-4 Timezone
+          dd.col-sm-8 {{ user.profile.timeZone }}
+          dt.col-sm-4 Currency
+          dd.col-sm-8 {{ user.profile.currency }}
+    //- pre.text-white {{ user | json }}
+
+template#tpl-transaction-list
+  ul.list-unstyled.text-white.mb-0
+    li(v-for="t in transactions").list-item.d-flex.py-2.px-3
+      category-icon(
+        :mapping="mapping"
+        :category-id="t.categoryId"
+        :interactive="interactive"
+        @change-category="handleCategoryChange"
+      )
+      .media-body.container.row.flex-nowrap
+        div.mr-2
+          button(
+            v-if="interactive"
+            :value="t.id" 
+            @click="$emit('similar', $event.currentTarget.value)"
+          ).btn.btn--link
+            h3.title {{ t.formattedDescription }}
+          h3(v-if="!interactive").title {{ t.formattedDescription }}
+          .small.faded {{ t.originalDate | toDate }}
+        .ml-auto.flex-shrink-0 {{ t.amount | amount | sensitive | currency }}
+
+template#tpl-drawer
+  .drawer(:class="{ 'is-closed': !open}")
+    .d-flex.p-3.align-items-center
+      h3.brand.mb-0 {{ title }}
+      button(@click="$emit('close')").btn.btn-outline-light.ml-auto &times;
+    slot
+
+template#tpl-category-icon
+  div
+    div(v-if="!interactive").transaction-logo.mr-3.rounded-circle.flex-shrink-0.d-flex.justify-content-center.align-items-center
+      span(
+        :class="categoryId | category(mapping) | fontIcon"
+        :title="categoryId | category(mapping)"
+        ).h4.mb-0
+    button(
+      v-if="interactive"
+      @click="$emit('change-category', $event.currentTarget.value)"
+      :value="categoryId"
+    ).transaction-logo.mr-3.rounded-circle.flex-shrink-0.d-flex.justify-content-center.align-items-center.btn.btn-outline-light
+      span(
+        :class="categoryId | category(mapping) | fontIcon"
+        :title="categoryId | category(mapping)"
+        ).h4.mb-0
+
+template#tpl-pagination
+  .ml-auto.p-3
+    .btn-group
+      button(v-for="index in numPages" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}

@@ -1,0 +1,163 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: #fff;
+    /* transition: all 400ms ease-out; */
+}
+
+.brand {
+    font-family: 'Yeseva One', cursive;
+    line-height: 1.1;
+}
+
+.t-shadow {
+    text-shadow: 1px 2px 0px rgba(0,0,0, 0.38)
+}
+
+h1,h2,h3 {
+    font-weight: 400;
+}
+
+.viewport {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+.sum {
+    font-size: 52px;
+}
+
+.box {
+    background-color: rgba(0,0,0,0.08);
+}
+
+.scrollarea {
+    overflow-y: auto;
+}
+
+.transaction-logo {
+    background-color: rgba(255,255,255,0.28);
+    width: 40px;
+    height: 40px;
+}
+
+.title {
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 400;
+}
+
+.list-item:not(:last-child) {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.vh {
+    height: 100vh;
+}
+
+.center-column {
+    width: 100%;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.date {
+    width: 100%;
+}
+
+.loading {
+    opacity: 0.25;
+}
+
+.loader-centered {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sidebar {
+    height: 100vh;
+    min-width: 14.375rem;
+    overflow-y: auto;
+}
+
+.faded {
+    opacity: 0.5;
+}
+
+.site-header {
+    height: 128px;
+    flex: none;
+}
+
+.alert-container {
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.alert-glass {
+    background-color: rgba(0, 0, 0, 0.87);
+}
+
+.form-actions {
+    justify-content: space-between;
+}
+
+.is-hidden {
+    visibility: hidden;
+}
+
+.drawer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.9);
+    transition: all 250ms ease-out;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer.is-closed {
+    transform: translateX(100%);
+}
+
+.btn.btn--link {
+    padding: 0;
+    color: #fff;
+}
+
+.btn.btn--link:hover {
+    text-decoration: underline;
+}
+
+.btn--naked {
+    border: none;
+    background: transparent;
+}
+
+.btn--naked:focus,
+.btn--naked:active {
+    outline: none;
+}
+
+.list-group--glass .list-group-item {
+    background-color: transparent;
+    color: inherit;
+    border-color: rgba(255,255,255,0.08);
+}
+
+.list-group--glass .list-group-item:active,
+.list-group--glass .list-group-item:focus,
+.list-group--glass .list-group-item:hover {
+    background-color: rgba(0,0,0, 0.27);
+}
