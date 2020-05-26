@@ -32,4 +32,4 @@ yarn
 yarn dev
 ```
 
-Visit `http://localost:1337` in your browser
+Visit `http://localhost:1337` in your browser
