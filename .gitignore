@@ -3,3 +3,5 @@ yarn-error.log
 .env
 src/mocks
 logs
+dist
+sessions

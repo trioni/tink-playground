@@ -59,8 +59,12 @@ function buildSearchBody(body: IncomingBody, defaults = defaultSearchQuery): Sea
 }
 
 function errorResponse(res: Response, err: GenericError, statusCode = 500): void {
-  console.error('ERROR: ', err);
-  res.status(statusCode).json({
+  let code = statusCode;
+  const matchedCode = err.message.match(/\d{3}/);
+  if (matchedCode) {
+    code = parseInt(matchedCode[0], 10);
+  }
+  res.status(code).json({
     error: err.message,
   });
 }
@@ -85,7 +89,7 @@ export const proxyHandler = async (req: Request, res: Response): Promise<any> =>
     }
     const method: Method = (req.method as Method) || 'GET';
     const contentType = req.get('Content-Type') || 'application/json';
-    const { token } = req.cookies;
+    const { token } = req.session;
     // console.log('>>> Method: ', method);
     // console.log('>>> Endpoint: ', apiEndpoint);
     // console.log('>>> Content-Type: ', contentType);
@@ -105,7 +109,7 @@ export const proxyHandler = async (req: Request, res: Response): Promise<any> =>
 };
 
 export const searchHandler = async (req: Request, res: Response): Promise<void> => {
-  const { token } = req.cookies;
+  const { token } = req.session;
 
   if (!token) {
     errorResponse(res, new Error('Missing token'), 401);

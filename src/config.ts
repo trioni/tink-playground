@@ -1,8 +1,10 @@
 export const CLIENT_ID = process.env.NODE_CLIENT_ID;
 export const CLIENT_SECRET = process.env.NODE_CLIENT_SECRET;
 export const REDIRECT_URI = process.env.NODE_REDIRECT_URI;
-export const PORT = 1337;
+export const ENV = process.env.NODE_ENV || 'development';
+export const PORT = process.env.PORT || 1337;
 export const API_HOST = 'https://api.tink.com/api/v1';
+export const SESSION_SECRET = process.env.NODE_SESSION_SECRET;
 
 export const MARKET_OPTIONS = [
   {

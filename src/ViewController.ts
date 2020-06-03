@@ -21,6 +21,10 @@ export function indexView(req: Request, res: Response): void {
   res.render('index', { marketOptions: MARKET_OPTIONS });
 }
 
+export function debug(req: Request, res: Response): void {
+  res.json({ REDIRECT_URI, API_HOST });
+}
+
 export function login(req: Request, res: Response): void {
   const tinkLinkUrl = `https://link.tink.com/1.0/authorize/?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&market=${
     req.query.market
@@ -66,7 +70,7 @@ export async function callbackView(req: Request, res: Response): Promise<void> {
 
   try {
     const accessToken = await exchangeCodeForToken(code);
-    res.cookie('token', accessToken);
+    req.session.token = accessToken;
     res.redirect('/search');
   } catch (err) {
     console.error('CallbackError: ', err);

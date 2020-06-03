@@ -5,14 +5,18 @@
   "author": "Oskar Nordgren <oskar.nordgren@tink.com>",
   "license": "MIT",
   "scripts": {
-    "start": "npx env-cmd ts-node src/server.ts",
-    "dev": "npx env-cmd nodemon --watch 'src/**/*.ts' --exec 'ts-node src/server.ts' -e ts"
+    "start": "NODE_ENV=production PORT=1337 node dist/server.js",
+    "start:local": "npx env-cmd ts-node src/server.ts",
+    "dev": "npx env-cmd nodemon --watch 'src/**/*.ts' --exec 'ts-node src/server.ts' -e ts",
+    "build": "tsc"
   },
   "dependencies": {
+    "@godaddy/terminus": "^4.4.1",
     "body-parser": "^1.19.0",
-    "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "got": "^10.0.4",
+    "memorystore": "^1.6.2",
     "morgan": "^1.9.1",
     "pug": "^2.0.4",
     "ts-node": "^8.3.0",
@@ -21,14 +25,17 @@
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",
     "@types/express": "^4.17.1",
+    "@types/express-session": "^1.17.0",
     "@types/got": "^9.6.9",
     "@types/morgan": "^1.7.37",
+    "@types/session-file-store": "^1.2.1",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
     "nodemon": "^1.19.1",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "session-file-store": "^1.4.0"
   }
 }
