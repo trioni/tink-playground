@@ -1,20 +1,22 @@
+:root {
+    --bg: rgb(245, 248, 249);
+    --text-color: #212121;
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color: #fff;
-    /* transition: all 400ms ease-out; */
+    font-family: 'Cousine', monospace;
+    background-color: var(--bg);
+    color: var(--text-color);
 }
 
 .brand {
-    font-family: 'Yeseva One', cursive;
+    font-family: 'Cousine', monospace;
+    font-weight: bold;
     line-height: 1.1;
-}
-
-.t-shadow {
-    text-shadow: 1px 2px 0px rgba(0,0,0, 0.38)
 }
 
 h1,h2,h3 {
@@ -33,7 +35,7 @@ h1,h2,h3 {
 }
 
 .box {
-    background-color: rgba(0,0,0,0.08);
+    background-color: #fff;
 }
 
 .scrollarea {
@@ -82,9 +84,14 @@ h1,h2,h3 {
 }
 
 .sidebar {
-    height: 100vh;
     min-width: 14.375rem;
     overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+    .sidebar {
+        height: 100vh;
+    }
 }
 
 .faded {
@@ -160,4 +167,9 @@ h1,h2,h3 {
 .list-group--glass .list-group-item:focus,
 .list-group--glass .list-group-item:hover {
     background-color: rgba(0,0,0, 0.27);
+}
+
+.index-layout {
+    /* display: flex;
+    flex-direction: column; */
 }

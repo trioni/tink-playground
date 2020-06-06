@@ -9,7 +9,7 @@ block content
   #root
     .d-flex.viewport
       .sidebar.mr-4.box.d-flex.flex-column
-        .site-header.justify-content-center.box.d-flex.flex-column.text-center.t-shadow
+        .site-header.justify-content-center.box.d-flex.flex-column.text-center
           button(
             @click="handleToggleSensitive"
             :class="{ 'la-otter': !$data.$sensitive, 'la-user-secret': $data.$sensitive }"
@@ -93,7 +93,7 @@ block content
                 p(v-if="!isSubmitting").mb-0.h2 No results
                 p(v-if="isSubmitting").mb-0.h2 Loading...
               .sum.p-3(:class="{ loading: isSubmitting }" v-if="response.count")
-                span.t-shadow {{ sum | amount | sensitive | currency }}
+                span {{ sum | amount | sensitive | currency }}
                 p.text-white-50.lead.mb-0
                   | Based on {{ response.count }} transactions
                   | in the past {{ form.startDate | daysAgo }} days.
