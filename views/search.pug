@@ -6,19 +6,25 @@ block headscripts
 
 block content
   include includes/templates.pug
-  #root
+  #root.search
     .d-flex.viewport
-      .sidebar.mr-4.box.d-flex.flex-column
+      .sidebar.mr-4.box.d-flex.flex-column(
+        :class="{'sidebar--closed': !$data.isSidebarOpen}"
+      )
         .site-header.justify-content-center.box.d-flex.flex-column.text-center
+          button(
+            @click="handleToggleSidebar"
+          ).d-md-none.btn.btn-outline-dark &times
           button(
             @click="handleToggleSensitive"
             :class="{ 'la-otter': !$data.$sensitive, 'la-user-secret': $data.$sensitive }"
-          ).las.display-4.btn--naked.text-white
+          ).las.display-4.btn--naked
           h1.h4.brand.mb-0 Acme Banking
+          .sidebar__overlay
         .scrollarea
           form(id="search-form" @submit="handleSubmit").p-3
             .form-group
-              label(for="queryString" class="small text-white-50") Query
+              label(for="queryString" class="small") Query
               input(
                 id="queryString"
                 name="queryString"
@@ -29,7 +35,7 @@ block content
 
             div
               .form-group
-                label(for="date" class="small text-white-50") Start Date
+                label(for="date" class="small") Start Date
                 input(
                   id="date"
                   name="startDate"
@@ -40,7 +46,7 @@ block content
                 )
 
             .form-group
-                label(for="category" class="small text-white-50") Cateogry
+                label(for="category" class="small") Cateogry
                 select(
                   id="category"
                   name="category"
@@ -59,12 +65,12 @@ block content
                 type="submit"
                 class="btn btn-primary"
                 :disabled="isSubmitting"
-              ).btn.btn-light.d-flex.align-items-center.position-relative
+              ).bt.d-flex.align-items-center.position-relative
                 div(v-if="isSubmitting" role="status").position-absolute.loader-centered
                   .spinner-border.spinner-border-sm
                   .sr-only Loading...
                 div(:class="{ 'is-hidden': isSubmitting }") Search
-              button(@click="handleReset" title="Reset").btn.btn-outline-light
+              button(@click="handleReset" title="Reset").btn.btn-outline-dark
                 i.la.la-times-circle
           .list-group.list-group-flush.list-group--glass
             button(@click="handleFetch" value="/investments").list-group-item.list-group-item-action
@@ -86,28 +92,21 @@ block content
           a.btn.btn-dark.btn-block(href='/') Restart
 
       .container-fluid.px-0.box
-        .mr-4.d-flex.flex-column.vh
+        .d-flex.flex-column.vh
           .site-header.box.text-center2.brand.d-flex.align-items-end.flex-none
+            button.btn.btn-outline-dark.d-md-none.align-self-stretch(
+              @click="handleToggleSidebar"
+            )
+              i.las.la-bars
             div
               .p-5(v-if="!response.count")
                 p(v-if="!isSubmitting").mb-0.h2 No results
                 p(v-if="isSubmitting").mb-0.h2 Loading...
               .sum.p-3(:class="{ loading: isSubmitting }" v-if="response.count")
                 span {{ sum | amount | sensitive | currency }}
-                p.text-white-50.lead.mb-0
+                p.lead.mb-0
                   | Based on {{ response.count }} transactions
                   | in the past {{ form.startDate | daysAgo }} days.
-            div(v-if="numPages > 1").ml-auto.p-3
-              .btn-group
-                //- button(v-for="index in numPages" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
-                template(v-for="index in numPages")
-                  button(v-if="index < 5" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
-                  .btn-group(v-if="index === 5" role="group")
-                    button(id="btnGroupDrop1" @click="handleTogglePagination" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false").btn.btn-outline-light.dropdown-toggle
-                      | ...
-                    .dropdown-menu.dropdown-menu-right(aria-labelledby="btnGroupDrop1" :class="{ show: isPaginationOpen }")
-                      button(v-for="index in numPages" v-if="index >= 5 && index <= numPages - 2" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").dropdown-item {{ index }}
-                  button(v-if="index > numPages - 2 && numPages > 5" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
           transaction-list(
             :key="'tranaction-list' + $data.$sensitive"
             v-if="response.count"
@@ -118,45 +117,58 @@ block content
             @similar="searchSimilar"
           ).scrollarea
 
+          div(v-if="numPages > 1").ml-auto.p-3
+            .btn-group.dropup
+              //- button(v-for="index in numPages" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-light {{ index }}
+              template(v-for="index in numPages")
+                button(v-if="index < 5" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-dark {{ index }}
+                .btn-group(v-if="index === 5" role="group")
+                  button(id="btnGroupDrop1" @click="handleTogglePagination" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false").btn.btn-outline-dark.dropdown-toggle
+                    | ...
+                  .dropdown-menu.dropdown-menu-right(aria-labelledby="btnGroupDrop1" :class="{ show: isPaginationOpen }")
+                    button(v-for="index in numPages" v-if="index >= 5 && index <= numPages - 2" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").dropdown-item {{ index }}
+                button(v-if="index > numPages - 2 && numPages > 5" :disabled="form.offset == ((index - 1) * 100) || isSubmitting" :value="(index - 1) * 100" name="offset" @click="handleChange").btn.btn-outline-dark {{ index }}
+
         drawer(
-          :open="Object.keys(secondaryData).length"
+          :open="Object.keys(secondaryData).length || isLoadingSecondary"
           :title="secondaryType"
           :key="'entity-drawer' + $data.$sensitive"
           @close="handleCloseDebug"
-        ).drawer
+        ).drawer.text-white
+          div(v-if="isLoadingSecondary").p-3 Loading...
           accounts(
-            v-if="secondaryType.indexOf('accounts') > -1"
+            v-if="secondaryType.indexOf('accounts') > -1 && !isLoadingSecondary"
             key="accounts"
             :entities="secondaryData.accounts"
           )
           accounts(
-            v-else-if="secondaryType.indexOf('loans') > -1"
+            v-else-if="secondaryType.indexOf('loans') > -1 && !isLoadingSecondary"
             key="loans"
             :entities="secondaryData.loans"
           )
           investments(
-            v-else-if="secondaryType.indexOf('investments') > -1"
+            v-else-if="secondaryType.indexOf('investments') > -1 && !isLoadingSecondary"
             :entities="secondaryData.portfolios"
           )
           user(
-            v-else-if="secondaryType.indexOf('user') > -1"
+            v-else-if="secondaryType.indexOf('user') > -1 && !isLoadingSecondary"
             :user="secondaryData"
           )
-          pre(v-else).text-white {{ secondaryData | json }}
+          pre(v-else) {{ secondaryData | json }}
 
         drawer(
           :open="!!similarTransactions.length"
           :key="'similar-drawer' + $data.$sensitive"
           title="Similar transactions"
           @close="handleCloseDrawer"
-        ).drawer
+        ).drawer.text-white
           transaction-list(
             v-if="similarTransactions.length"
             :transactions="similarTransactions"
             :mapping="categoryMap"
           ).scrollarea
 
-    div(v-if="error").alert-container.position-absolute.shadow
+    div(v-if="error").alert-container.position-absolute.shadow.text-white
       .alert.alert-glass.mb-0.d-flex.align-items-center.pr-2
         p.mb-0 {{error}}
         button(@click="handleClearError").btn.btn-outline-light.ml-4 &times

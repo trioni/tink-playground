@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import got from 'got';
-import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, API_HOST, MARKET_OPTIONS } from './config';
+import { REDIRECT_URI, API_HOST, MARKET_OPTIONS, getSecret, SecretName } from './config';
 
 const httpClient = got.extend({
   prefixUrl: API_HOST,
@@ -22,11 +22,12 @@ export function indexView(req: Request, res: Response): void {
 }
 
 export function debug(req: Request, res: Response): void {
-  res.json({ REDIRECT_URI, API_HOST });
+  res.json({ REDIRECT_URI, API_HOST, clientId: getSecret(SecretName.CLIENT_ID) });
 }
 
-export function login(req: Request, res: Response): void {
-  const tinkLinkUrl = `https://link.tink.com/1.0/authorize/?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&market=${
+export async function login(req: Request, res: Response) {
+  const clientId = await getSecret(SecretName.CLIENT_ID);
+  const tinkLinkUrl = `https://link.tink.com/1.0/authorize/?client_id=${clientId}&redirect_uri=${REDIRECT_URI}&market=${
     req.query.market
   }&scope=${scopes.join(',')}${req.query.test === 'test' ? '&test=true' : ''}`;
   res.redirect(tinkLinkUrl);
@@ -44,12 +45,14 @@ type TokenResponse = {
 };
 
 async function exchangeCodeForToken(code: string) {
+  const clientId = await getSecret(SecretName.CLIENT_ID);
+  const clientSecret = await getSecret(SecretName.CLIENT_SECRET);
   const tokenResult = await httpClient.post<TokenResponse>('oauth/token', {
     form: {
       code: code,
       /* eslint-disable @typescript-eslint/camelcase */
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       grant_type: 'authorization_code',
     },
   });

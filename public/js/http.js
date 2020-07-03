@@ -27,7 +27,10 @@ const Http = window.Http || {};
   }
 
   function fetchEndpoint(endpoint, init) {
-    return fetch(`/api/proxy${endpoint}`, init).then(parseResponse);
+    return fetch(`/api/proxy${endpoint}`, {
+      credentials: 'include',
+      ...init,
+    }).then(parseResponse);
   }
 
   const sortBy = key => (a, b) => {

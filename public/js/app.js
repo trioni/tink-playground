@@ -111,15 +111,21 @@ async function start() {
       similarTransactions: [],
       secondaryData: {},
       secondaryType: '',
+      isLoadingSecondary: false,
+      isDrawerOpen: false,
       numPages: 0,
       currentQuery: '',
       isPaginationOpen: false,
       $sensitive: window.$sensitive,
+      isSidebarOpen: true,
     },
     methods: {
       handleToggleSensitive: function() {
         window.$sensitive = !window.$sensitive;
         this.$data.$sensitive = window.$sensitive;
+      },
+      handleToggleSidebar: function() {
+        this.$data.isSidebarOpen = !this.$data.isSidebarOpen;
       },
       updateQuery: function(obj, reset = false) {
         const nextQuery = {
@@ -148,12 +154,15 @@ async function start() {
       },
       handleFetch: async function(e) {
         try {
+          this.isLoadingSecondary = true;
           const endpoint = e.currentTarget.value;
           const res = await Http.fetchEndpoint(endpoint);
           this.secondaryData = res;
           this.secondaryType = endpoint;
         } catch (err) {
           this.error = err.message;
+        } finally {
+          this.isLoadingSecondary = false;
         }
       },
       handleTogglePagination: function() {
@@ -195,7 +204,6 @@ async function start() {
             ...this.form,
             startDate: document.querySelector('input[type=date]').valueAsNumber,
           });
-          updateBackgroundGradient();
         } catch (err) {
           this.error = err.message;
         } finally {
