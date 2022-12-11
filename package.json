@@ -14,7 +14,7 @@
     "@godaddy/terminus": "^4.4.1",
     "@google-cloud/secret-manager": "^3.0.0",
     "body-parser": "^1.19.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.1",
     "got": "^10.0.4",
     "memorystore": "^1.6.2",
